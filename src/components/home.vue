@@ -49,6 +49,7 @@
         </el-aside>
         <!-- <div class="el-scrollbar__bar is-vertical"><div class="el-scrollbar__thumb" style="transform: translateY(170.114%); height: 32.4125%;"></div></div> -->
         <el-main>
+            <h1 v-if="homeShow">欢迎来到在线记账本</h1>
             <router-view></router-view>
         </el-main>
         
@@ -69,7 +70,8 @@ export default {
     return {
       msg: 'Bill',
       username: "xxx",
-      isCollapse: false
+      isCollapse: false,
+      homeShow: false
     }
   },
   methods: {

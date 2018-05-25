@@ -57,6 +57,9 @@ export default {
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
     },
+    getEveryDayCategory() {
+      //获取这个月每天的消费记录，并将其展示出来
+    }
   }
 }
 </script>

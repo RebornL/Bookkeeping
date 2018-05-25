@@ -47,17 +47,46 @@ export default {
     }
   },
   methods: {
-    handleLogin() {
-      this.$refs.form.validate((valid) => {
-        console.log(valid)
-      })
-    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          let flag = false;
+          //make a crypt
+          let salt = this.$bcrypt.genSaltSync(12);    //定义密码加密的计算强度,默认10   
+          let password = this.$bcrypt.hashSync(this.$refs[formName].model.password, salt);
+          // this.$ref[formName].model.password = password;
           //验证成功提交数据
-          alert('submit!');
-          this.$router.push("/home")
+          console.log(password, this.$refs[formName].model.username);
+          //发起post请求
+          // this.$http({
+          //   url: "http://localhost:8089/user/save",
+          //   method: "post",
+            // data: {
+            //   username: this.$refs[formName].model.username,
+            //   password: password
+            // },
+          //   transformRequest: [function (data) {
+          //       // Do whatever you want to transform the data
+          //       let ret = ''
+          //       for (let it in data) {
+          //           ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+          //       }
+          //       return ret
+          //   }],
+          //   headers: {'Content-Type':'application/x-www-form-urlencoded'}
+          // }).then((response) => {
+          //   //返回数据进行处理
+          //   var data = response.data;
+          //   if(data.id > 0) {
+          //     flag = true;
+          //   }
+          // })
+          // alert('submit!');
+          flag = true;
+          if(flag){
+            //登陆成功或注册成功
+            this.$router.push("/home")
+          }
         } else {
           console.log('error submit!!');
           return false;
@@ -65,6 +94,7 @@ export default {
       });
     },
     resetForm(formName) {
+      console.log(this.$refs[formName].model);
       this.$refs[formName].resetFields();
     }
   }
