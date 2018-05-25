@@ -8,14 +8,16 @@ import echarts from 'echarts';
 import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios'
 import bcrypt from 'bcryptjs'
+// import Cookies from 'js-cookies'
 // var bcrypt = require('bcryptjs');    //引入bcryptjs库
 
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.prototype.$echarts = echarts;
-Vue.prototype.$http = axios
-Vue.prototype.$bcrypt = bcrypt
+Vue.prototype.$http = axios;
+Vue.prototype.$bcrypt = bcrypt;
+// Vue.prototype.$cookies = Cookies;
 
 /* eslint-disable no-new */
 new Vue({

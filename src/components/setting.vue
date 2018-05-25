@@ -43,9 +43,6 @@ export default {
   },
   data () {
     return {
-        categoryForm: {
-        category: "",
-        },
         configForm: {
             key: "预算",
             value: 0
@@ -69,6 +66,31 @@ export default {
           //验证成功提交数据
           alert('submit!');
           // this.$router.push("/home/overview")
+          //提交config
+          this.$http({
+              method: "post",
+              url: "http://lcoalhost:8089/config/save",
+              data: {
+                  key: this.$refs[formName].model.key,
+                  value: this.$refs[formName].model.value,
+                  uid: this.$cookie.get("uid")
+              },
+              transformRequest: [function (data) {
+                // Do whatever you want to transform the data
+                let ret = ''
+                for (let it in data) {
+                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                }
+                return ret
+            }],
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}
+          }).then((response) => {
+              //返回数据进行处理
+            var data = response.data;
+            if(data.id > 0) {
+            //   flag = true;
+            }
+          })
         } else {
           console.log('error submit!!');
           return false;

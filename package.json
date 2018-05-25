@@ -16,10 +16,10 @@
     "echarts": "^4.1.0",
     "element-ui": "^2.3.9",
     "fish-ui": "^1.1.9",
-    "js-cookies": "^1.0.4",
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
     "vue": "^2.5.2",
+    "vue-js-cookie": "^2.1.0",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

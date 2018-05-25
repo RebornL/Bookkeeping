@@ -48,6 +48,7 @@ export default {
     return {
       categoryForm: {
         category: "",
+        count: 0
       },
 
       rules: {
@@ -66,11 +67,11 @@ export default {
         name: '饮料',
         count: 15
       }, {
-        id: '1',
+        id: '3',
         name: '出行',
         count: 2
       }, {
-        id: '1',
+        id: '4',
         name: '租房',
         count: 1
       }]
@@ -83,6 +84,30 @@ export default {
           //验证成功提交数据
           alert('submit!');
           // this.$router.push("/home/overview")
+          //提交category
+          this.$http({
+            url: "http://localhost:8089/category/save",
+            method: "post",
+            data: {
+              name: this.$refs[categoryForm].model.category,
+              uid: this.$cookie.get("uid")
+            },
+            transformRequest: [function (data) {
+                // Do whatever you want to transform the data
+                let ret = ''
+                for (let it in data) {
+                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                }
+                return ret
+            }],
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}
+          }).then((response) => {
+            //返回数据进行处理
+            var data = response.data;
+            if(data.id > 0) {
+              flag = true;
+            }
+          })
         } else {
           console.log('error submit!!');
           return false;
@@ -91,6 +116,22 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
+    },
+    getCategory() {
+      //获取该用户定义的category
+      this.$http({
+        method: "GET",
+        url: "http://localhost:8089/category/getCategory",
+        params: {
+          uid: this.$cookie.get("uid")
+        }
+      }).then((response) => {
+        let data = response.data;
+        data.forEach((category) => {
+          category.count = 0;
+          this.tableData.push(category);
+        })
+      });
     }
   }
 }
