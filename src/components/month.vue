@@ -66,7 +66,7 @@ export default {
       //获取这个月每天的消费记录，并将其展示出来
       this.$http({
           method: "GET",
-          url: "http://localhost:8089/category/getmonthrecord"
+          url: "http://localhost:8089/config/getMonthRecord"
       }).then((response)=>{
           let monthRecord = response.data;
           monthRecord.forEach(record => {

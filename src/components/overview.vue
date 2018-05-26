@@ -90,17 +90,32 @@ export default {
             }
         })
     },
-    getOtherData() {
+    getConsumeDate() {
         //获取已经消费的金额
         this.$http({
             method: "GET",
-            url: "http://localhost:8089/category/getResume",
+            url: "http://localhost:8089/category/getConsume",
+            param: {
+                uid: this.$cookie.get("uid")
+            }
         }).then((response) => {
             let data = response.data;
-            let monthResume = data.monthResume;
-            this.monthRemain = this.buget - monthResume;
-            
+            let monthConsume = data.monthConsume;
+            let dateNum = new Date().getDate();
+            this.averageConsume = monthConsume / dateNum;
+            this.monthRemain = this.buget - monthConsume;
+
         })
+    },
+    fillData() {
+        let maxDay = new Date(new Date().getYear(), new Date().getMonth+1, 0);
+        this.leftDay = maxDay - new Date().getDate + 1;
+        this.getConsumeDate();
+
+        if(this.buget == 0) {
+            //还没设置预算
+            this.showchart = false;
+        }
     }
   }
 }
