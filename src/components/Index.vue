@@ -56,36 +56,40 @@ export default {
           let password = this.$bcrypt.hashSync(this.$refs[formName].model.password, salt);
           // this.$ref[formName].model.password = password;
           //验证成功提交数据
-          console.log(password, this.$refs[formName].model.username);
+          // console.log(password, this.$refs[formName].model.username);
           //发起post请求
-          // this.$http({
-          //   url: "http://localhost:8089/user/save",
-          //   method: "post",
-            // data: {
-            //   username: this.$refs[formName].model.username,
-            //   password: password
-            // },
-          //   transformRequest: [function (data) {
-          //       // Do whatever you want to transform the data
-          //       let ret = ''
-          //       for (let it in data) {
-          //           ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
-          //       }
-          //       return ret
-          //   }],
-          //   headers: {'Content-Type':'application/x-www-form-urlencoded'}
-          // }).then((response) => {
-          //   //返回数据进行处理
-          //   var data = response.data;
-          //   if(data.id > 0) {
-          //     flag = true;
-          //   }
-          // })
-          // alert('submit!');
-          flag = true;
+          this.$http({
+            url: "http://localhost:8089/user/save",
+            method: "post",
+            data: {
+              username: this.$refs[formName].model.username,
+              password: password
+            },
+            transformRequest: [function (data) {
+                // Do whatever you want to transform the data
+                let ret = ''
+                for (let it in data) {
+                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                }
+                return ret
+            }],
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}
+          }).then((response) => {
+            //返回数据进行处理
+            var data = response.data;
+            console.log(data);
+            if(data.id > 0) {
+              flag = true;
+            }
+          })
+          // flag = true;
           if(flag){
             //登陆成功或注册成功
-            this.$router.push("/home")
+            alert('submit!');            
+            this.$router.push("/home");
+          } else {
+            alert("服务器繁忙，请稍后再试");
+            this.$router.go(0);
           }
         } else {
           console.log('error submit!!');

@@ -74,7 +74,16 @@ export default {
       homeShow: false
     }
   },
+  mounted() {
+      this.checkLogin();
+  },
   methods: {
+    checkLogin() {
+        var uid = this.$cookie.get(uid);
+        if (uid == null) {
+            this.$router.push("/");
+        }
+    },
     handleOpen(key, keyPath) {
         console.log(key, keyPath);
     },

@@ -18,6 +18,8 @@ Vue.prototype.$echarts = echarts;
 Vue.prototype.$http = axios;
 Vue.prototype.$bcrypt = bcrypt;
 // Vue.prototype.$cookies = Cookies;
+var VueCookie = require('vue-cookie');
+Vue.use(VueCookie)
 
 /* eslint-disable no-new */
 new Vue({
