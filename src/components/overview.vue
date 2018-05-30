@@ -31,6 +31,7 @@ export default {
         todayConsume: 0,
         averageConsume: 0,
         monthRemain: 0,
+        monthConsume: 0,
         averageRemain: 0,
         leftDay: 0,
         homeShow: false,
@@ -39,7 +40,12 @@ export default {
     }
   },
   mounted() {
-      this.drawPie();
+        
+        this.fillData();
+        this.drawPie();
+        
+        this.averageConsume = 0;
+        this.monthRemain = 0;
   },
   methods: {
     drawPie() {
@@ -53,7 +59,7 @@ export default {
                 name: "本月支出",
                 type: 'pie',
                 data: [
-                    {name: '已使用', value: (this.buget-this.monthRemain), itemStyle:{color: '#c23531'}},
+                    {name: '已使用', value: this.monthConsume, itemStyle:{color: '#c23531'}},
                     {name: '剩余', value: this.monthRemain, itemStyle:{color: '#412512'}}
                 ]
                 },
@@ -77,16 +83,26 @@ export default {
             // 使用刚指定的配置项和数据显示图表。
             myChart.setOption(option);
         }
+        console.log(this.averageConsume);
+        console.log(this.monthRemain);
     },
     getBuget() {
         this.$http({
             method: "GET",
-            url: "http://localhost:8089/config/getbuget",
+            url: "http://localhost:8089/config/getConfig",
+            params: {
+                uid: this.$cookie.get("uid")
+            }
         }).then((response) => {
             let data = response.data;
-            if(data == null) {
-                //第一次使用，不显示表格
+            if(Object.is(data.error, undefined)) {
+                this.buget = data.value;
+                this.showchart = true;
+            } else {
+                //第一次使用，不显示表格或者没有设置预算
                 //数据保持默认零值
+                this.showchart = false;
+                
             }
         })
     },
@@ -100,22 +116,24 @@ export default {
             }
         }).then((response) => {
             let data = response.data;
-            let monthConsume = data.monthConsume;
-            let dateNum = new Date().getDate();
-            this.averageConsume = monthConsume / dateNum;
-            this.monthRemain = this.buget - monthConsume;
-
+            if(Object.is(data.error, undefined)){
+                this.monthConsume = data.monthConsume;
+                let dayNum = new Date().getDate();
+                this.averageConsume = this.monthConsume / dayNum;
+                this.monthRemain = this.buget - this.monthConsume;
+            }                 
+            
         })
     },
     fillData() {
-        let maxDay = new Date(new Date().getYear(), new Date().getMonth+1, 0);
-        this.leftDay = maxDay - new Date().getDate + 1;
+        this.getBuget();
+
+        let maxDay = new Date(new Date().getYear(), new Date().getMonth()+1, 0).getDate();
+        this.leftDay = maxDay - new Date().getDate() + 1;
+        console.log(maxDay, this.leftDay);
         this.getConsumeDate();
 
-        if(this.buget == 0) {
-            //还没设置预算
-            this.showchart = false;
-        }
+
     }
   }
 }

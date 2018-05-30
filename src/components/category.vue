@@ -57,39 +57,42 @@ export default {
           { min: 1, message: '至少1个字符', trigger: 'blur' }
         ]
       },
-
-      tableData: [{
-        id: '1',
-        name: '食品',
-        count: 20
-      }, {
-        id: '2',
-        name: '饮料',
-        count: 15
-      }, {
-        id: '3',
-        name: '出行',
-        count: 2
-      }, {
-        id: '4',
-        name: '租房',
-        count: 1
-      }]
+      tableData : []
+      // tableData: [{
+      //   id: '1',
+      //   name: '食品',
+      //   count: 20
+      // }, {
+      //   id: '2',
+      //   name: '饮料',
+      //   count: 15
+      // }, {
+      //   id: '3',
+      //   name: '出行',
+      //   count: 2
+      // }, {
+      //   id: '4',
+      //   name: '租房',
+      //   count: 1
+      // }]
     }
+  },
+  mounted() {
+    this.getCategory();
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
+        console.log(valid);
         if (valid) {
-          //验证成功提交数据
-          alert('submit!');
+          
           // this.$router.push("/home/overview")
           //提交category
           this.$http({
-            url: "http://localhost:8089/category/save",
+            url: "http://localhost:8089/category/addCategory",
             method: "post",
             data: {
-              name: this.$refs[categoryForm].model.category,
+              name: this.$refs[formName].model.category,
               uid: this.$cookie.get("uid")
             },
             transformRequest: [function (data) {
@@ -103,9 +106,15 @@ export default {
             headers: {'Content-Type':'application/x-www-form-urlencoded'}
           }).then((response) => {
             //返回数据进行处理
+            console.log(response);
             var data = response.data;
-            if(data.id > 0) {
-              flag = true;
+            if(Object.is(data.error, undefined)) {
+                // flag = true;
+                data.count = 0;
+                this.tableData.push(data);
+                this.categoryForm = {};
+                //验证成功提交数据
+                alert('submit!');
             }
           })
         } else {
@@ -121,7 +130,7 @@ export default {
       //获取该用户定义的category
       this.$http({
         method: "GET",
-        url: "http://localhost:8089/category/getCategory",
+        url: "http://localhost:8089/category/getAllCategory",
         params: {
           uid: this.$cookie.get("uid")
         }

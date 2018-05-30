@@ -71,7 +71,8 @@ export default {
       msg: 'Bill',
       username: "xxx",
       isCollapse: false,
-      homeShow: false
+      homeShow: false,
+      uid: 0
     }
   },
   mounted() {
@@ -79,9 +80,14 @@ export default {
   },
   methods: {
     checkLogin() {
-        var uid = this.$cookie.get(uid);
-        if (uid == null) {
-            this.$router.push("/");
+
+        var uid = this.$cookie.get("uid");
+        // console.log(uid);
+        // console.log(this.$cookie.get("test"))
+        if (uid) {
+            this.uid = parseInt(uid);
+        } else {
+            this.$router.push("/");            
         }
     },
     handleOpen(key, keyPath) {

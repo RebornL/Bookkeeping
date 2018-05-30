@@ -52,8 +52,9 @@ export default {
         if (valid) {
           let flag = false;
           //make a crypt
-          let salt = this.$bcrypt.genSaltSync(12);    //定义密码加密的计算强度,默认10   
-          let password = this.$bcrypt.hashSync(this.$refs[formName].model.password, salt);
+          // let salt = this.$bcrypt.genSaltSync(12);    //定义密码加密的计算强度,默认10   
+          // let password = this.$bcrypt.hashSync(this.$refs[formName].model.password, salt);
+          let password = this.$refs[formName].model.password;
           // this.$ref[formName].model.password = password;
           //验证成功提交数据
           // console.log(password, this.$refs[formName].model.username);
@@ -81,18 +82,20 @@ export default {
             if(data.id > 0) {
               flag = true;
             }
+
+            if(flag){
+                //登陆成功或注册成功
+                alert('登陆成功');            
+                this.$router.push("/home");
+            } else {
+                alert("服务器繁忙，请稍后再试");
+                this.$router.go(0);
+            }
           })
           // flag = true;
-          if(flag){
-            //登陆成功或注册成功
-            alert('submit!');            
-            this.$router.push("/home");
-          } else {
-            alert("服务器繁忙，请稍后再试");
-            this.$router.go(0);
-          }
+          
         } else {
-          console.log('error submit!!');
+          alert('用户名或密码有误');
           return false;
         }
       });

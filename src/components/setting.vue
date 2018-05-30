@@ -48,28 +48,34 @@ export default {
             value: 0
         },
         rules: {
-        category: [
-            { required: true, message: '请输入支出类型', trigger: 'blur' },
-            { min: 1, message: '至少1个字符', trigger: 'blur' }
-        ]},
-        configTable: [{
-            id: '1',
-            key: '预算',
+          value: [
+              { required: true, message: '请输入预算', trigger: 'blur' },
+              { min: 1, message: '至少1个字符', trigger: 'blur' }
+          ]
+        },
+        configTable: []
+        /*{
+            id: 0,
+            key: "",
             value: 2000
-        }]
+        }*/
     }
+  },
+  mounted() {
+    this.getConfig();
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          //验证成功提交数据
-          alert('submit!');
+          
           // this.$router.push("/home/overview")
           //提交config
+          console.log(this.$refs[formName].model.value);
+          console.log(this.$refs[formName].model.key)
           this.$http({
+              url: "http://localhost:8089/config/save",
               method: "post",
-              url: "http://lcoalhost:8089/config/save",
               data: {
                   key: this.$refs[formName].model.key,
                   value: this.$refs[formName].model.value,
@@ -77,19 +83,25 @@ export default {
               },
               transformRequest: [function (data) {
                 // Do whatever you want to transform the data
-                let ret = ''
+                let ret = '';
                 for (let it in data) {
                     ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
                 }
-                return ret
+                return ret;
             }],
             headers: {'Content-Type':'application/x-www-form-urlencoded'}
           }).then((response) => {
               //返回数据进行处理
-            var data = response.data;
-            if(data.id > 0) {
-            //   flag = true;
-            }
+              console.log(response);
+              var data = response.data;
+              if(Object.is(data.error, undefined)) {
+              //   flag = true;
+                //验证成功提交数据
+                alert('submit!');
+                this.configForm.value = "";
+                //初始版本只有设置预算
+                this.configForm[0].value = data.value;
+              }
           })
         } else {
           console.log('error submit!!');
@@ -99,7 +111,25 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
-    }
+    },
+    getConfig() {
+      this.$http({
+            method: "GET",
+            url: "http://localhost:8089/config/getConfig",
+            params: {
+                uid: this.$cookie.get("uid")
+            }
+        }).then((response) => {
+            let data = response.data;
+            if(Object.is(data.error, undefined)) {
+                let config = {};
+                config.id = data.id;
+                config.key = data.key;
+                config.value = data.value;
+                this.configTable.push(config);
+            }
+        })
+    },
   }
 }
 </script>
