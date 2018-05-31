@@ -43,6 +43,40 @@
 </template>
 
 <script>
+//格式化日期
+Date.prototype.format = function(fmt) {
+    var o = {         
+    "M+" : this.getMonth()+1, //月份         
+    "d+" : this.getDate(), //日         
+    "h+" : this.getHours()%12 == 0 ? 12 : this.getHours()%12, //小时         
+    "H+" : this.getHours(), //小时         
+    "m+" : this.getMinutes(), //分         
+    "s+" : this.getSeconds(), //秒         
+    "q+" : Math.floor((this.getMonth()+3)/3), //季度         
+    "S" : this.getMilliseconds() //毫秒         
+    };         
+    var week = {         
+    "0" : "/u65e5",         
+    "1" : "/u4e00",         
+    "2" : "/u4e8c",         
+    "3" : "/u4e09",         
+    "4" : "/u56db",         
+    "5" : "/u4e94",         
+    "6" : "/u516d"        
+    };         
+    if(/(y+)/.test(fmt)){         
+        fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));         
+    }         
+    if(/(E+)/.test(fmt)){         
+        fmt=fmt.replace(RegExp.$1, ((RegExp.$1.length>1) ? (RegExp.$1.length>2 ? "/u661f/u671f" : "/u5468") : "")+week[this.getDay()+""]);         
+    }         
+    for(var k in o){         
+        if(new RegExp("("+ k +")").test(fmt)){         
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));         
+        }         
+    }         
+    return fmt;
+}
 
 export default {
   name: 'Record',
@@ -82,7 +116,7 @@ export default {
             }
             }]
         },
-        cidOptions: [{
+        cidOptions: [],/*{
           value: '选项1',
           label: '黄金糕'
         }, {
@@ -97,32 +131,119 @@ export default {
         }, {
           value: '选项5',
           label: '北京烤鸭'
-        }],
+        }*/
         rules: {
-        category: [
+          spend: [
+            { required: true, message: '请输入花费', trigger: 'blur' },
+            { min: 1, message: '至少1个字符', trigger: 'blur' }
+          ],
+          cid: [
+            {required: true, message: '请选择分类'}
+          ],
+          comment: [
             { required: true, message: '请输入支出类型', trigger: 'blur' },
             { min: 1, message: '至少1个字符', trigger: 'blur' }
-        ]
+          ]
         },
 
     }
+  },
+  mounted() {
+    this.getCategory();
+    // setTimeout(this.checkCidOption, 1000);
+    // this.checkCidOption();
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           //验证成功提交数据
-          alert('submit!');
+          console.log({
+              spend: this.$refs[formName].model.spend,
+              cid: this.$refs[formName].model.cid,
+              comment: this.$refs[formName].model.comment,
+              date: this.$refs[formName].model.date.format("yyyy-MM-dd"),
+              uid: this.$cookie.get("uid")
+            });
+          this.$http({
+            url: "http://localhost:8089/record/addRecord",
+            method: "post",
+            data: {
+              spend: this.$refs[formName].model.spend,
+              cid: this.$refs[formName].model.cid,
+              comment: this.$refs[formName].model.comment,
+              date: this.$refs[formName].model.date.format("yyyy-MM-dd"),
+              uid: this.$cookie.get("uid")
+            },
+            transformRequest: [function (data) {
+                // Do whatever you want to transform the data
+                let ret = '';
+                for (let it in data) {
+                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&';
+                }
+                return ret;
+            }],
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}
+          }).then((response) => {
+            console.log(response);
+            let data = response.data;
+            if(Object.is(data.error, undefined)) {
+              this.recordForm.spend = 0;
+              this.recordForm.comment = "";
+              alert('新增记录成功！');
+              
+            } else {
+              alert("提交失败，请重试!");
+            }
+          });
           // this.$router.push("/home/overview")
         } else {
-          console.log('error submit!!');
+          console.log('输入有误!');
           return false;
         }
       });
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
-    }
+    },
+    checkCidOption() {
+      //检测用户是否设置分类标签
+      if(this.cidOptions.length == 0) {
+        alert("请先到‘消费分类’中添加分类");
+        this.$router.push("category");
+      }
+    },
+    getCategory() {
+      this.$http({
+        method: "GET",
+        url: "http://localhost:8089/category/getAllCategory",
+        params: {
+          uid: this.$cookie.get("uid")
+        }
+      }).then((response) => {
+        console.log(response);
+        var data = response.data;
+        /*data:[
+              {
+                  "id": "2",
+                  "name": "饮料",
+                  "uid": "0"
+              },
+              {
+                  "id": "1",
+                  "name": "食品",
+                  "uid": "0"
+              }
+          ]*/
+        data.forEach((category) => {
+          let option = {};
+          option.value = category.id;
+          option.label = category.name;
+          this.cidOptions.push(option);
+        });
+        this.checkCidOption();
+      })
+    },
   }
 }
 </script>

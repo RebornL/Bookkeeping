@@ -97,14 +97,14 @@ export default {
               if(Object.is(data.error, undefined)) {
               //   flag = true;
                 //验证成功提交数据
-                alert('submit!');
+                alert('完成!');
                 this.configForm.value = "";
                 //初始版本只有设置预算
-                this.configForm[0].value = data.value;
+                this.configTable[0].value = data.value;
               }
           })
         } else {
-          console.log('error submit!!');
+          console.log('填写有误!!');
           return false;
         }
       });
